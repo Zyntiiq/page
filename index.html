@@ -69,14 +69,14 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, var(--glass-border-opacity));
             border-radius: 12px;
-            padding: 1.5rem; /* Reverted to original padding */
+            padding: 1.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             width: 100%;
             margin-left: auto;
             margin-right: auto;
-            position: relative; /* Ensure cards are relative for absolutely positioned children */
-            overflow: visible; /* Reverted to original overflow */
+            position: relative;
+            overflow: hidden; /* Added to clip content extending beyond border-radius */
         }
         .card:hover {
             transform: translateY(-5px);
@@ -97,6 +97,7 @@
             border: 1px solid rgba(255, 255, 255, var(--glass-border-opacity)); /* Keep the border */
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.15); /* Base shadow */
             transition: all 0.4s ease; /* Smoother transition for all properties */
+            overflow: hidden; /* Added to clip content extending beyond border-radius */
         }
         .join-card:hover {
             transform: translateY(-5px);
@@ -430,20 +431,6 @@
         .enroll-button.button-press-active {
             animation: button-press 0.3s ease-out;
         }
-
-        /* Styling for the number positioned on the border (REMOVED) */
-        /* .number-on-border {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2;
-            background-color: transparent;
-            padding: 0 0.75rem;
-            border-radius: 0.5rem;
-            white-space: nowrap;
-            text-align: center;
-        } */
 
         /* FAQ specific styles (no longer in use, but kept for historical context if needed later) */
         .faq-item .question {
@@ -907,7 +894,7 @@
 
                         // If the intersecting element is the stats section, trigger its counters
                         if (entry.target.id === 'statsSection') {
-                            animateCounter('membersCounter', 3500); // Updated value here
+                            animateCounter('membersCounter', 3500);
                             animateCounter('hoursCounter', 50);
                             animateCounter('lecturesCounter', 150);
                         }
