@@ -70,8 +70,9 @@
             border: 1px solid rgba(255, 255, 255, var(--glass-border-opacity));
             border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            /* Changed box-shadow color to a transparent dark purple */
+            box-shadow: 0 4px 6px rgba(43, 27, 59, 0.2), 0 10px 20px rgba(43, 27, 59, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease-in-out, filter 0.5s ease-in-out; /* Added opacity and filter to transition */
             width: 100%;
             margin-left: auto;
             margin-right: auto;
@@ -80,7 +81,8 @@
         }
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0, 0, 0, 0.25);
+            /* Changed hover box-shadow color to a transparent dark purple */
+            box-shadow: 0 8px 12px rgba(43, 27, 59, 0.3), 0 15px 30px rgba(43, 27, 59, 0.45);
         }
 
         /* Specific styles for smaller cards like stats and benefits */
@@ -95,16 +97,17 @@
             padding-bottom: 1rem;
             background: linear-gradient(135deg, var(--secondary-dark-purple), var(--primary-dark-purple) 80%); /* Richer gradient */
             border: 1px solid rgba(255, 255, 255, var(--glass-border-opacity)); /* Keep the border */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.15); /* Base shadow */
+            /* Changed box-shadow color to a transparent dark purple */
+            box-shadow: 0 4px 6px rgba(43, 27, 59, 0.2), 0 10px 20px rgba(43, 27, 59, 0.3);
             transition: all 0.4s ease; /* Smoother transition for all properties */
             overflow: hidden; /* Added to clip content extending beyond border-radius */
         }
         .join-card:hover {
             transform: translateY(-5px);
-            /* Added a glowing effect on hover */
+            /* Added a glowing effect on hover, keeping purple shadow */
             box-shadow: 0 0 25px rgba(144, 76, 237, 0.7), /* Medium purple glow */
                         0 0 50px rgba(144, 76, 237, 0.5), /* Larger, softer glow */
-                        0 15px 30px rgba(0, 0, 0, 0.3); /* Deeper shadow */
+                        0 15px 30px rgba(43, 27, 59, 0.45); /* Deeper dark purple shadow */
         }
         .join-card ul {
             margin-top: 2rem; /* Increased margin for better spacing */
@@ -432,6 +435,15 @@
             animation: button-press 0.3s ease-out;
         }
 
+        /* New class for merged effect on scroll */
+        .card-scrolled-merged {
+            transform: scale(0.95); /* Slightly scale down */
+            opacity: 0.7; /* Reduce opacity */
+            filter: brightness(0.8); /* Darken slightly to blend more */
+            /* You can adjust the box-shadow here for a more merged look if desired */
+            box-shadow: 0 2px 4px rgba(43, 27, 59, 0.1), 0 5px 10px rgba(43, 27, 59, 0.2);
+        }
+
         /* FAQ specific styles (no longer in use, but kept for historical context if needed later) */
         .faq-item .question {
             display: flex;
@@ -538,7 +550,7 @@
             </div>
 
             <!-- Right Column (All Premium Features - now separate cards in a grid) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 items-start max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 items-start max-w-5xl mx-auto" id="premiumFeaturesSection">
                 <h3 class="text-2xl font-bold text-white mb-4 md:col-span-3 text-center">All Premium Features</h3>
                 <!-- Feature 1: Exclusive Access (Key) -->
                 <div class="card small-card feature-card-animated flex flex-col items-center p-6 text-center">
@@ -951,6 +963,46 @@
                     }
                 });
             }
+
+            // New scroll-based merge/revert feature for premium features tiles
+            const premiumFeaturesSection = document.getElementById('premiumFeaturesSection');
+            const featureCards = document.querySelectorAll('.feature-card-animated');
+            let lastScrollY = window.scrollY;
+            let isCardsMerged = false; // To prevent redundant class toggling
+
+            function handleFeatureCardsScroll() {
+                const currentScrollY = window.scrollY;
+                const scrollDirection = currentScrollY > lastScrollY ? 'down' : 'up';
+                lastScrollY = currentScrollY;
+
+                if (!premiumFeaturesSection) return; // Exit if section is not found
+
+                const rect = premiumFeaturesSection.getBoundingClientRect();
+                // Check if the section is at least partially in view
+                const isInView = (rect.top < window.innerHeight) && (rect.bottom > 0);
+
+                if (isInView) {
+                    if (scrollDirection === 'down' && !isCardsMerged) {
+                        featureCards.forEach(card => card.classList.add('card-scrolled-merged'));
+                        isCardsMerged = true;
+                    } else if (scrollDirection === 'up' && isCardsMerged) {
+                        featureCards.forEach(card => card.classList.remove('card-scrolled-merged'));
+                        isCardsMerged = false;
+                    }
+                } else {
+                    // If scrolled out of view, ensure cards are reverted
+                    if (isCardsMerged) {
+                        featureCards.forEach(card => card.classList.remove('card-scrolled-merged'));
+                        isCardsMerged = false;
+                    }
+                }
+            }
+
+            // Attach the scroll listener after DOM content is loaded
+            window.addEventListener('scroll', handleFeatureCardsScroll);
+
+            // Also call it once on load to set initial state if the section is already in view
+            handleFeatureCardsScroll();
         });
     </script>
 </body>
